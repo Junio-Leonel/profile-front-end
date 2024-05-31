@@ -15,6 +15,7 @@ export function Login() {
     await fetch("http://localhost/api/v1/login", {
       method: "POST",
       headers: {
+        Accept: "aplication/json",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -22,13 +23,15 @@ export function Login() {
         password,
       }),
     })
-      .then((response) => response.json())
       .then((response) => {
-        if (response.message === "Not Authorized") {
-          redirect("/");
+        if (response.status !== 200) {
+          throw new Error("Failed");
         }
 
-        cookies().set("token", response.data.token);
+        return response.json();
+      })
+      .then((response) => {
+        cookies().set("token", response.token);
 
         redirect("/profile");
       });
